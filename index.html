@@ -5,69 +5,105 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Casino Mini App</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 15px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .app-container {
+            max-width: 100%;
+        }
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        .balance-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .menu-section {
+            margin-bottom: 25px;
+        }
+        button {
+            padding: 12px;
+            background-color: #0088cc;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            box-sizing: border-box;
+        }
+        .win { color: green; }
+        .lose { color: red; }
+        .hidden { display: none; }
+    </style>
 </head>
 <body>
     <div class="app-container">
-        <!-- Шапка приложения -->
         <header class="app-header">
-            <h1>🎰 Казино Mini App</h1>
+            <h1>🎰 Казино</h1>
             <div class="balance-container">
-                <span id="user-balance">0.00 USD</span>
-                <button id="refresh-balance">🔄</button>
+                <span id="user-balance">10.00 USD</span>
             </div>
         </header>
 
-        <!-- Основное меню -->
-        <div class="main-menu" id="main-menu">
+        <div id="main-menu">
             <div class="menu-section">
-                <h2>💰 Баланс</h2>
-                <button class="menu-btn" id="deposit-btn">Пополнить</button>
-                <button class="menu-btn" id="withdraw-btn">Вывести</button>
+                <button id="dice-game">🎲 Угадай число (x5)</button>
+                <button id="even-odd-game">🔢 Чёт/Нечёт (x1.8)</button>
+                <button id="roulette-game">🎰 Рулетка (x1.8-30)</button>
             </div>
-
             <div class="menu-section">
-                <h2>🎮 Игры</h2>
-                <button class="menu-btn" id="dice-game">🎲 Угадай число</button>
-                <button class="menu-btn" id="even-odd-game">🔢 Чёт/Нечёт</button>
-                <button class="menu-btn" id="high-low-game">⬆️⬇️ Больше/Меньше</button>
-                <button class="menu-btn" id="darts-game">🎯 Дартс</button>
-                <button class="menu-btn" id="football-game">⚽ Футбол</button>
-                <button class="menu-btn" id="basketball-game">🏀 Баскетбол</button>
-                <button class="menu-btn" id="bowling-game">🎳 Боулинг</button>
-                <button class="menu-btn" id="roulette-game">🎰 Рулетка</button>
+                <button id="deposit-btn">💰 Пополнить</button>
+                <button id="withdraw-btn">📤 Вывести</button>
             </div>
-
             <div class="menu-section">
-                <h2>👤 Профиль</h2>
-                <button class="menu-btn" id="profile-btn">📊 Статистика</button>
-                <button class="menu-btn" id="referral-btn">👥 Рефералка</button>
-                <button class="menu-btn" id="help-btn">ℹ️ Помощь</button>
+                <button id="profile-btn">📊 Профиль</button>
+                <button id="help-btn">ℹ️ Помощь</button>
             </div>
         </div>
 
         <!-- Форма депозита -->
-        <div class="form-container" id="deposit-form" style="display: none;">
+        <div id="deposit-form" class="hidden">
             <h2>Пополнение баланса</h2>
-            <input type="number" id="deposit-amount" placeholder="Сумма (минимум 0.1 USD)" min="0.1" step="0.1">
+            <input type="number" id="deposit-amount" placeholder="Сумма (мин. 0.1 USD)" min="0.1" step="0.1">
             <button id="submit-deposit">Пополнить</button>
             <button class="back-btn">Назад</button>
         </div>
 
         <!-- Форма вывода -->
-        <div class="form-container" id="withdraw-form" style="display: none;">
+        <div id="withdraw-form" class="hidden">
             <h2>Вывод средств</h2>
-            <input type="number" id="withdraw-amount" placeholder="Сумма (минимум 0.1 USD)" min="0.1" step="0.1">
-            <input type="text" id="withdraw-wallet" placeholder="Ваш USDT кошелек">
+            <input type="number" id="withdraw-amount" placeholder="Сумма (мин. 0.1 USD)" min="0.1" step="0.1">
+            <input type="text" id="wallet-address" placeholder="Ваш USDT-адрес">
             <button id="submit-withdraw">Вывести</button>
             <button class="back-btn">Назад</button>
         </div>
 
         <!-- Игра в кубик -->
-        <div class="game-container" id="dice-game-container" style="display: none;">
+        <div id="dice-game-container" class="hidden">
             <h2>🎲 Угадай число</h2>
-            <input type="number" id="dice-bet-amount" placeholder="Ставка" min="0.1" step="0.1">
-            <div class="number-selector">
+            <input type="number" id="dice-bet" placeholder="Ставка (мин. 0.1 USD)" min="0.1" step="0.1">
+            <div id="dice-numbers">
                 <button class="number-btn" data-number="1">1</button>
                 <button class="number-btn" data-number="2">2</button>
                 <button class="number-btn" data-number="3">3</button>
@@ -78,71 +114,328 @@
             <button class="back-btn">Назад</button>
         </div>
 
-        <!-- Профиль пользователя -->
-        <div class="profile-container" id="profile-container" style="display: none;">
-            <h2>👤 Ваш профиль</h2>
-            <div class="profile-info">
-                <p><strong>ID:</strong> <span id="profile-id"></span></p>
-                <p><strong>Имя:</strong> <span id="profile-name"></span></p>
-                <p><strong>Баланс:</strong> <span id="profile-balance"></span></p>
-                <p><strong>Игр сыграно:</strong> <span id="profile-games"></span></p>
-                <p><strong>Побед:</strong> <span id="profile-wins"></span></p>
-                <p><strong>Поражений:</strong> <span id="profile-losses"></span></p>
-                <p><strong>Процент побед:</strong> <span id="profile-winrate"></span></p>
+        <!-- Рулетка -->
+        <div id="roulette-game-container" class="hidden">
+            <h2>🎰 Рулетка</h2>
+            <input type="number" id="roulette-bet" placeholder="Ставка (мин. 0.1 USD)" min="0.1" step="0.1">
+            <div id="roulette-choices">
+                <button class="color-btn" data-color="🔴">🔴 Красное (x1.8)</button>
+                <button class="color-btn" data-color="⚫">⚫ Чёрное (x1.8)</button>
+                <button class="color-btn" data-color="🟢">🟢 Зелёное (x30)</button>
             </div>
             <button class="back-btn">Назад</button>
         </div>
 
-        <!-- Реферальная система -->
-        <div class="referral-container" id="referral-container" style="display: none;">
-            <h2>👥 Реферальная система</h2>
-            <div class="referral-info">
-                <p><strong>Ваша реферальная ссылка:</strong></p>
-                <div class="referral-link" id="referral-link"></div>
-                <p><strong>Приглашено пользователей:</strong> <span id="referral-count">0</span></p>
-                <p><strong>Заработано:</strong> <span id="referral-earnings">0.00 USD</span></p>
-            </div>
-            <button id="withdraw-referral" class="action-btn">Вывести реферальный баланс</button>
-            <button class="back-btn">Назад</button>
-        </div>
-
-        <!-- Помощь -->
-        <div class="help-container" id="help-container" style="display: none;">
-            <h2>ℹ️ Помощь</h2>
-            <div class="help-content">
-                <h3>Как играть?</h3>
-                <p>1. Выберите игру из меню</p>
-                <p>2. Сделайте ставку</p>
-                <p>3. Сделайте выбор (число, цвет и т.д.)</p>
-                <p>4. Получите результат и выигрыш!</p>
-                
-                <h3>Коэффициенты:</h3>
-                <ul>
-                    <li>🎲 Угадай число: ×5</li>
-                    <li>🔢 Чёт/Нечёт: ×1.8</li>
-                    <li>⬆️⬇️ Больше/Меньше: ×1.8</li>
-                    <li>🎯 Дартс: ×1.8-2.5</li>
-                    <li>⚽ Футбол: ×1.5-2.0</li>
-                    <li>🎰 Рулетка: ×1.8-30</li>
-                </ul>
-                
-                <h3>Правила:</h3>
-                <p>• Минимальная ставка: 0.1 USD</p>
-                <p>• Вывод от 0.1 USD</p>
-                <p>• Рефералы приносят 10% от их проигрышей</p>
+        <!-- Профиль -->
+        <div id="profile-container" class="hidden">
+            <h2>📊 Ваш профиль</h2>
+            <div id="profile-info">
+                <p>ID: <span id="user-id"></span></p>
+                <p>Баланс: <span id="profile-balance"></span></p>
+                <p>Игр сыграно: <span id="games-played">0</span></p>
+                <p>Побед: <span id="wins">0</span></p>
+                <p>Поражений: <span id="losses">0</span></p>
             </div>
             <button class="back-btn">Назад</button>
         </div>
 
-        <!-- Результаты игры -->
-        <div class="result-container" id="result-container" style="display: none;">
+        <!-- Результат игры -->
+        <div id="result-container" class="hidden">
             <h2 id="result-title">Результат</h2>
-            <div id="result-content"></div>
+            <div id="result-text"></div>
             <button id="play-again">Играть снова</button>
             <button class="back-btn">В меню</button>
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <script>
+        // Инициализация Telegram WebApp
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+
+        // Состояние приложения
+        const state = {
+            balance: 10.00,
+            gamesPlayed: 0,
+            wins: 0,
+            losses: 0,
+            currentGame: null,
+            currentBet: 0,
+            currentChoice: null
+        };
+
+        // Рулетка
+        const ROULETTE_NUMBERS = [
+            { number: 0, color: '🟢' },
+            { number: 32, color: '🔴' }, { number: 15, color: '⚫' },
+            { number: 19, color: '🔴' }, { number: 4, color: '⚫' },
+            { number: 21, color: '🔴' }, { number: 2, color: '⚫' },
+            { number: 25, color: '🔴' }, { number: 17, color: '⚫' },
+            { number: 34, color: '🔴' }, { number: 6, color: '⚫' },
+            { number: 27, color: '🔴' }, { number: 13, color: '⚫' },
+            { number: 36, color: '🔴' }, { number: 11, color: '⚫' },
+            { number: 30, color: '🔴' }, { number: 8, color: '⚫' },
+            { number: 23, color: '🔴' }, { number: 10, color: '⚫' },
+            { number: 5, color: '🔴' }, { number: 24, color: '⚫' },
+            { number: 16, color: '🔴' }, { number: 33, color: '⚫' },
+            { number: 1, color: '🔴' }, { number: 20, color: '⚫' },
+            { number: 14, color: '🔴' }, { number: 31, color: '⚫' },
+            { number: 9, color: '🔴' }, { number: 22, color: '⚫' },
+            { number: 18, color: '🔴' }, { number: 29, color: '⚫' },
+            { number: 7, color: '🔴' }, { number: 28, color: '⚫' },
+            { number: 12, color: '🔴' }, { number: 35, color: '⚫' },
+            { number: 3, color: '🔴' }, { number: 26, color: '⚫' }
+        ];
+
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', () => {
+            updateUI();
+            setupEventListeners();
+        });
+
+        // Обновление интерфейса
+        function updateUI() {
+            document.getElementById('user-balance').textContent = state.balance.toFixed(2) + ' USD';
+            document.getElementById('profile-balance').textContent = state.balance.toFixed(2) + ' USD';
+            document.getElementById('games-played').textContent = state.gamesPlayed;
+            document.getElementById('wins').textContent = state.wins;
+            document.getElementById('losses').textContent = state.losses;
+            
+            if (tg.initDataUnsafe.user) {
+                document.getElementById('user-id').textContent = tg.initDataUnsafe.user.id;
+            }
+        }
+
+        // Настройка обработчиков
+        function setupEventListeners() {
+            // Меню
+            document.getElementById('dice-game').addEventListener('click', () => showGame('dice'));
+            document.getElementById('even-odd-game').addEventListener('click', () => showGame('even_odd'));
+            document.getElementById('roulette-game').addEventListener('click', () => showGame('roulette'));
+            document.getElementById('deposit-btn').addEventListener('click', () => showSection('deposit-form'));
+            document.getElementById('withdraw-btn').addEventListener('click', () => showSection('withdraw-form'));
+            document.getElementById('profile-btn').addEventListener('click', () => showSection('profile-container'));
+            document.getElementById('help-btn').addEventListener('click', showHelp);
+            
+            // Назад
+            document.querySelectorAll('.back-btn').forEach(btn => {
+                btn.addEventListener('click', () => showSection('main-menu'));
+            });
+            
+            // Депозит
+            document.getElementById('submit-deposit').addEventListener('click', processDeposit);
+            
+            // Вывод
+            document.getElementById('submit-withdraw').addEventListener('click', processWithdraw);
+            
+            // Кубик
+            document.querySelectorAll('.number-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const bet = parseFloat(document.getElementById('dice-bet').value);
+                    if (validateBet(bet)) {
+                        playDice(bet, parseInt(this.dataset.number));
+                    }
+                });
+            });
+            
+            // Рулетка
+            document.querySelectorAll('.color-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const bet = parseFloat(document.getElementById('roulette-bet').value);
+                    if (validateBet(bet)) {
+                        playRoulette(bet, this.dataset.color);
+                    }
+                });
+            });
+            
+            // Играть снова
+            document.getElementById('play-again').addEventListener('click', () => {
+                if (state.currentGame) {
+                    showGame(state.currentGame);
+                } else {
+                    showSection('main-menu');
+                }
+            });
+        }
+
+        // Показать раздел
+        function showSection(sectionId) {
+            document.querySelectorAll('div[id]').forEach(div => {
+                div.classList.add('hidden');
+            });
+            document.getElementById(sectionId).classList.remove('hidden');
+        }
+
+        // Показать игру
+        function showGame(gameType) {
+            state.currentGame = gameType;
+            if (gameType === 'dice') {
+                showSection('dice-game-container');
+            } else if (gameType === 'roulette') {
+                showSection('roulette-game-container');
+            } else if (gameType === 'even_odd') {
+                startEvenOddGame();
+            }
+        }
+
+        // Проверка ставки
+        function validateBet(bet) {
+            if (isNaN(bet) {
+                alert('Введите корректную сумму ставки');
+                return false;
+            }
+            
+            if (bet < 0.1) {
+                alert('Минимальная ставка - 0.1 USD');
+                return false;
+            }
+            
+            if (bet > state.balance) {
+                alert('Недостаточно средств на балансе');
+                return false;
+            }
+            
+            return true;
+        }
+
+        // Игра в кубик
+        function playDice(bet, chosenNumber) {
+            state.balance -= bet;
+            state.gamesPlayed++;
+            
+            const result = Math.floor(Math.random() * 6) + 1;
+            const win = chosenNumber === result;
+            
+            if (win) {
+                const winAmount = bet * 5;
+                state.balance += winAmount;
+                state.wins++;
+                showResult(`🎲 Выпало: ${result}\n\n🎉 Вы выиграли ${winAmount.toFixed(2)} USD!`, true);
+            } else {
+                state.losses++;
+                showResult(`🎲 Выпало: ${result}\n\n❌ Вы проиграли ${bet.toFixed(2)} USD`, false);
+            }
+            
+            updateUI();
+        }
+
+        // Рулетка
+        function playRoulette(bet, chosenColor) {
+            state.balance -= bet;
+            state.gamesPlayed++;
+            
+            const { number, color } = ROULETTE_NUMBERS[Math.floor(Math.random() * ROULETTE_NUMBERS.length)];
+            const win = chosenColor === color;
+            let coefficient = 0;
+            
+            if (win) {
+                if (color === '🟢') coefficient = 30;
+                else coefficient = 1.8;
+                
+                const winAmount = bet * coefficient;
+                state.balance += winAmount;
+                state.wins++;
+                showResult(`🎰 Выпало: ${number} ${color}\n\n🎉 Вы выиграли ${winAmount.toFixed(2)} USD!`, true);
+            } else {
+                state.losses++;
+                showResult(`🎰 Выпало: ${number} ${color}\n\n❌ Вы проиграли ${bet.toFixed(2)} USD`, false);
+            }
+            
+            updateUI();
+        }
+
+        // Чёт/Нечёт
+        function startEvenOddGame() {
+            const bet = parseFloat(prompt('Введите сумму ставки (мин. 0.1 USD):'));
+            if (!validateBet(bet)) return;
+            
+            const choice = prompt('Выберите "Чёт" или "Нечёт":').toLowerCase();
+            if (choice !== 'чёт' && choice !== 'нечёт') {
+                alert('Пожалуйста, выберите "Чёт" или "Нечёт"');
+                return;
+            }
+            
+            state.balance -= bet;
+            state.gamesPlayed++;
+            
+            const resultNum = Math.floor(Math.random() * 6) + 1;
+            const resultType = resultNum % 2 === 0 ? 'чёт' : 'нечёт';
+            const win = choice === resultType;
+            
+            if (win) {
+                const winAmount = bet * 1.8;
+                state.balance += winAmount;
+                state.wins++;
+                showResult(`🎲 Выпало: ${resultNum} (${resultType})\n\n🎉 Вы выиграли ${winAmount.toFixed(2)} USD!`, true);
+            } else {
+                state.losses++;
+                showResult(`🎲 Выпало: ${resultNum} (${resultType})\n\n❌ Вы проиграли ${bet.toFixed(2)} USD`, false);
+            }
+            
+            updateUI();
+        }
+
+        // Показать результат
+        function showResult(text, isWin) {
+            document.getElementById('result-title').textContent = isWin ? '🎉 Победа!' : '❌ Поражение';
+            document.getElementById('result-text').innerHTML = text;
+            document.getElementById('result-text').className = isWin ? 'win' : 'lose';
+            showSection('result-container');
+        }
+
+        // Депозит
+        function processDeposit() {
+            const amount = parseFloat(document.getElementById('deposit-amount').value);
+            
+            if (isNaN(amount) || amount < 0.1) {
+                alert('Минимальная сумма пополнения - 0.1 USD');
+                return;
+            }
+            
+            state.balance += amount;
+            document.getElementById('deposit-amount').value = '';
+            updateUI();
+            showSection('main-menu');
+            alert(`Баланс пополнен на ${amount.toFixed(2)} USD!`);
+        }
+
+        // Вывод
+        function processWithdraw() {
+            const amount = parseFloat(document.getElementById('withdraw-amount').value);
+            const wallet = document.getElementById('wallet-address').value.trim();
+            
+            if (isNaN(amount) || amount < 0.1) {
+                alert('Минимальная сумма вывода - 0.1 USD');
+                return;
+            }
+            
+            if (amount > state.balance) {
+                alert('Недостаточно средств на балансе');
+                return;
+            }
+            
+            if (!wallet) {
+                alert('Введите адрес кошелька');
+                return;
+            }
+            
+            state.balance -= amount;
+            document.getElementById('withdraw-amount').value = '';
+            document.getElementById('wallet-address').value = '';
+            updateUI();
+            showSection('main-menu');
+            alert(`Запрос на вывод ${amount.toFixed(2)} USD на кошелек ${wallet} принят!`);
+        }
+
+        // Помощь
+        function showHelp() {
+            alert(`🎰 Казино Mini App\n\n
+Игры:\n
+🎲 Угадай число - угадайте число от 1 до 6 (коэф. x5)\n
+🔢 Чёт/Нечёт - угадайте четность числа (коэф. x1.8)\n
+🎰 Рулетка - угадайте цвет (коэф. x1.8-x30)\n\n
+Минимальная ставка: 0.1 USD`);
+        }
+    </script>
 </body>
 </html>
