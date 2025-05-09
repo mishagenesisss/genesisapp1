@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Casino Mini App</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Шапка приложения -->
+        <header class="app-header">
+            <h1>🎰 Казино Mini App</h1>
+            <div class="balance-container">
+                <span id="user-balance">0.00 USD</span>
+                <button id="refresh-balance">🔄</button>
+            </div>
+        </header>
+
+        <!-- Основное меню -->
+        <div class="main-menu" id="main-menu">
+            <div class="menu-section">
+                <h2>💰 Баланс</h2>
+                <button class="menu-btn" id="deposit-btn">Пополнить</button>
+                <button class="menu-btn" id="withdraw-btn">Вывести</button>
+            </div>
+
+            <div class="menu-section">
+                <h2>🎮 Игры</h2>
+                <button class="menu-btn" id="dice-game">🎲 Угадай число</button>
+                <button class="menu-btn" id="even-odd-game">🔢 Чёт/Нечёт</button>
+                <button class="menu-btn" id="high-low-game">⬆️⬇️ Больше/Меньше</button>
+                <button class="menu-btn" id="darts-game">🎯 Дартс</button>
+                <button class="menu-btn" id="football-game">⚽ Футбол</button>
+                <button class="menu-btn" id="basketball-game">🏀 Баскетбол</button>
+                <button class="menu-btn" id="bowling-game">🎳 Боулинг</button>
+                <button class="menu-btn" id="roulette-game">🎰 Рулетка</button>
+            </div>
+
+            <div class="menu-section">
+                <h2>👤 Профиль</h2>
+                <button class="menu-btn" id="profile-btn">📊 Статистика</button>
+                <button class="menu-btn" id="referral-btn">👥 Рефералка</button>
+                <button class="menu-btn" id="help-btn">ℹ️ Помощь</button>
+            </div>
+        </div>
+
+        <!-- Форма депозита -->
+        <div class="form-container" id="deposit-form" style="display: none;">
+            <h2>Пополнение баланса</h2>
+            <input type="number" id="deposit-amount" placeholder="Сумма (минимум 0.1 USD)" min="0.1" step="0.1">
+            <button id="submit-deposit">Пополнить</button>
+            <button class="back-btn">Назад</button>
+        </div>
+
+        <!-- Форма вывода -->
+        <div class="form-container" id="withdraw-form" style="display: none;">
+            <h2>Вывод средств</h2>
+            <input type="number" id="withdraw-amount" placeholder="Сумма (минимум 0.1 USD)" min="0.1" step="0.1">
+            <input type="text" id="withdraw-wallet" placeholder="Ваш USDT кошелек">
+            <button id="submit-withdraw">Вывести</button>
+            <button class="back-btn">Назад</button>
+        </div>
+
+        <!-- Игра в кубик -->
+        <div class="game-container" id="dice-game-container" style="display: none;">
+            <h2>🎲 Угадай число</h2>
+            <input type="number" id="dice-bet-amount" placeholder="Ставка" min="0.1" step="0.1">
+            <div class="number-selector">
+                <button class="number-btn" data-number="1">1</button>
+                <button class="number-btn" data-number="2">2</button>
+                <button class="number-btn" data-number="3">3</button>
+                <button class="number-btn" data-number="4">4</button>
+                <button class="number-btn" data-number="5">5</button>
+                <button class="number-btn" data-number="6">6</button>
+            </div>
+            <button class="back-btn">Назад</button>
+        </div>
+
+        <!-- Профиль пользователя -->
+        <div class="profile-container" id="profile-container" style="display: none;">
+            <h2>👤 Ваш профиль</h2>
+            <div class="profile-info">
+                <p><strong>ID:</strong> <span id="profile-id"></span></p>
+                <p><strong>Имя:</strong> <span id="profile-name"></span></p>
+                <p><strong>Баланс:</strong> <span id="profile-balance"></span></p>
+                <p><strong>Игр сыграно:</strong> <span id="profile-games"></span></p>
+                <p><strong>Побед:</strong> <span id="profile-wins"></span></p>
+                <p><strong>Поражений:</strong> <span id="profile-losses"></span></p>
+                <p><strong>Процент побед:</strong> <span id="profile-winrate"></span></p>
+            </div>
+            <button class="back-btn">Назад</button>
+        </div>
+
+        <!-- Реферальная система -->
+        <div class="referral-container" id="referral-container" style="display: none;">
+            <h2>👥 Реферальная система</h2>
+            <div class="referral-info">
+                <p><strong>Ваша реферальная ссылка:</strong></p>
+                <div class="referral-link" id="referral-link"></div>
+                <p><strong>Приглашено пользователей:</strong> <span id="referral-count">0</span></p>
+                <p><strong>Заработано:</strong> <span id="referral-earnings">0.00 USD</span></p>
+            </div>
+            <button id="withdraw-referral" class="action-btn">Вывести реферальный баланс</button>
+            <button class="back-btn">Назад</button>
+        </div>
+
+        <!-- Помощь -->
+        <div class="help-container" id="help-container" style="display: none;">
+            <h2>ℹ️ Помощь</h2>
+            <div class="help-content">
+                <h3>Как играть?</h3>
+                <p>1. Выберите игру из меню</p>
+                <p>2. Сделайте ставку</p>
+                <p>3. Сделайте выбор (число, цвет и т.д.)</p>
+                <p>4. Получите результат и выигрыш!</p>
+                
+                <h3>Коэффициенты:</h3>
+                <ul>
+                    <li>🎲 Угадай число: ×5</li>
+                    <li>🔢 Чёт/Нечёт: ×1.8</li>
+                    <li>⬆️⬇️ Больше/Меньше: ×1.8</li>
+                    <li>🎯 Дартс: ×1.8-2.5</li>
+                    <li>⚽ Футбол: ×1.5-2.0</li>
+                    <li>🎰 Рулетка: ×1.8-30</li>
+                </ul>
+                
+                <h3>Правила:</h3>
+                <p>• Минимальная ставка: 0.1 USD</p>
+                <p>• Вывод от 0.1 USD</p>
+                <p>• Рефералы приносят 10% от их проигрышей</p>
+            </div>
+            <button class="back-btn">Назад</button>
+        </div>
+
+        <!-- Результаты игры -->
+        <div class="result-container" id="result-container" style="display: none;">
+            <h2 id="result-title">Результат</h2>
+            <div id="result-content"></div>
+            <button id="play-again">Играть снова</button>
+            <button class="back-btn">В меню</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
